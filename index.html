@@ -100,6 +100,50 @@
       </div>
     </section>
 
+    <!-- 1-Hour Volume Chart (Past Weeks) Card -->
+    <section class="card" id="card-1h-weeks">
+      <div class="card-header">
+        <div class="card-title-group">
+          <h2 class="card-title">
+            <i class="fa-solid fa-calendar-week" style="color: #818cf8;"></i>
+            Volume 1H - So sánh các tuần trước
+          </h2>
+          <span class="card-subtitle" id="subtitle-1h-weeks">So sánh volume tại cùng thứ và khung giờ này ở các tuần trước</span>
+        </div>
+        
+        <div class="countdown-container">
+          <span class="countdown-label">Đóng khung sau</span>
+          <div class="countdown-badge" id="countdown-1h-weeks" style="color: #818cf8; border-color: rgba(129, 140, 248, 0.3);">
+            <i class="fa-solid fa-hourglass-half"></i>
+            <span id="timer-1h-weeks">--:--</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Summary stats -->
+      <div class="stat-summary">
+        <div class="stat-box">
+          <span class="stat-label">Volume Hiện Tại</span>
+          <span class="stat-value" id="value-current-1h-weeks">0.00</span>
+          <span class="stat-compare" id="compare-1h-weeks" style="color: var(--text-muted);">
+            Đang tích lũy...
+          </span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-label">TB Các Tuần Trước</span>
+          <span class="stat-value" id="value-avg-1h-weeks">0.00</span>
+          <span class="stat-compare" style="color: var(--text-muted);">
+            Trung bình 4 tuần trước
+          </span>
+        </div>
+      </div>
+      
+      <!-- Chart Area -->
+      <div class="chart-container">
+        <canvas id="chart-1h-weeks-canvas"></canvas>
+      </div>
+    </section>
+
     <!-- 4-Hour Volume Chart Card -->
     <section class="card" id="card-4h">
       <div class="card-header">
@@ -144,6 +188,49 @@
       </div>
     </section>
 
+    <!-- 4-Hour Volume Chart (Past Weeks) Card -->
+    <section class="card" id="card-4h-weeks">
+      <div class="card-header">
+        <div class="card-title-group">
+          <h2 class="card-title">
+            <i class="fa-solid fa-calendar-days" style="color: #22d3ee;"></i>
+            Volume 4H - So sánh các tuần trước
+          </h2>
+          <span class="card-subtitle" id="subtitle-4h-weeks">So sánh volume tại cùng thứ và khung 4H này ở các tuần trước</span>
+        </div>
+        
+        <div class="countdown-container">
+          <span class="countdown-label">Đóng khung sau</span>
+          <div class="countdown-badge" id="countdown-4h-weeks" style="color: #22d3ee; border-color: rgba(34, 211, 238, 0.3);">
+            <i class="fa-solid fa-hourglass-half"></i>
+            <span id="timer-4h-weeks">--:--:--</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Summary stats -->
+      <div class="stat-summary">
+        <div class="stat-box">
+          <span class="stat-label">Volume Hiện Tại</span>
+          <span class="stat-value" id="value-current-4h-weeks">0.00</span>
+          <span class="stat-compare" id="compare-4h-weeks" style="color: var(--text-muted);">
+            Đang tích lũy...
+          </span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-label">TB Các Tuần Trước</span>
+          <span class="stat-value" id="value-avg-4h-weeks">0.00</span>
+          <span class="stat-compare" style="color: var(--text-muted);">
+            Trung bình 4 tuần trước
+          </span>
+        </div>
+      </div>
+      
+      <!-- Chart Area -->
+      <div class="chart-container">
+        <canvas id="chart-4h-weeks-canvas"></canvas>
+      </div>
+    </section>
   </main>
 
   <!-- Footer -->
