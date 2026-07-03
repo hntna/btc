@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Crypto Volume Analyzer - Real-time Dashboard</title>
+  <title>Crypto Futures Volume Analyzer - Real-time Dashboard</title>
   
   <!-- CSS Styles -->
   <link rel="stylesheet" href="style.css">
@@ -21,14 +21,14 @@
     <div class="logo-section">
       <i class="fa-solid fa-chart-line logo-icon"></i>
       <div>
-        <h1>Crypto Volume Analyzer</h1>
+        <h1>Crypto Futures Volume Analyzer</h1>
       </div>
     </div>
     
     <div class="realtime-status">
       <!-- Price Display -->
       <div class="price-card">
-        <span class="price-symbol" id="ticker-symbol">ETH/USDT</span>
+        <span class="price-symbol" id="ticker-symbol">ETH/USDT Perpetual</span>
         <span class="price-value" id="ticker-price">---.--</span>
         <span class="price-change" id="ticker-change">
           <i class="fa-solid" id="ticker-change-icon"></i>
@@ -48,8 +48,8 @@
   <div class="controls-bar">
     <label for="symbol-select" style="display:none;">Chọn cặp giao dịch</label>
     <select class="symbol-selector" id="symbol-select">
-      <option value="ETHUSDT" selected>ETH / USDT</option>
-      <option value="BTCUSDT">BTC / USDT</option>
+      <option value="ETHUSDT" selected>ETH / USDT Perpetual</option>
+      <option value="BTCUSDT">BTC / USDT Perpetual</option>
     </select>
   </div>
 

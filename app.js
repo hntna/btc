@@ -79,7 +79,7 @@ function updateStatusBadge(status, text) {
 // Fetch 24h Ticker Information (to initialize price change percentage)
 async function fetchTickerInfo(symbol) {
   try {
-    const res = await fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${symbol}`);
+    const res = await fetch(`https://fapi.binance.com/fapi/v1/ticker/24hr?symbol=${symbol}`);
     const data = await res.json();
     updateTickerUI(data.lastPrice, data.priceChangePercent, symbol);
   } catch (err) {
@@ -117,11 +117,11 @@ function updateTickerUI(priceStr, percentStr, symbol) {
 async function fetchHistoricalKlines(symbol) {
   try {
     // 1H: Limit 800 candles (about 33 days) to cover the last 4 weeks of the same weekday/hour
-    const res1h = await fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=1h&limit=800`);
+    const res1h = await fetch(`https://fapi.binance.com/fapi/v1/klines?symbol=${symbol}&interval=1h&limit=800`);
     candles1h = await res1h.json();
     
     // 4H: Limit 200 candles (about 33 days)
-    const res4h = await fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=4h&limit=200`);
+    const res4h = await fetch(`https://fapi.binance.com/fapi/v1/klines?symbol=${symbol}&interval=4h&limit=200`);
     candles4h = await res4h.json();
     
     processHistoricalData();
@@ -564,7 +564,7 @@ function initWebSocket(symbol) {
     `${symbol.toLowerCase()}@ticker`
   ].join('/');
   
-  socket = new WebSocket(`wss://stream.binance.com:9443/stream?streams=${streams}`);
+  socket = new WebSocket(`wss://fstream.binance.com/stream?streams=${streams}`);
   
   socket.onopen = () => {
     updateStatusBadge('connected', 'WebSocket Đang Hoạt Động');
