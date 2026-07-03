@@ -9,28 +9,35 @@ let socket = null;
 // Historical Kline data arrays
 let candles1h = [];
 let candles4h = [];
+let candles1d = [];
 
 // Filtered day of week candles (Monday to Sunday)
 let dayData1h = Array(7).fill(null);
 let dayData4h = Array(7).fill(null);
+let dayData1d = Array(7).fill(null);
 
 // Filtered week-over-week candles (same weekday and hour for past weeks)
 let weeksData1h = [];
 let weeksData4h = [];
+let weeksData1d = [];
 
 // Chart.js Instances
 let chart1h = null;
 let chart4h = null;
+let chart1d = null;
 let chart1hWeeks = null;
 let chart4hWeeks = null;
+let chart1dWeeks = null;
 
 // Countdown Target Timestamps (ms)
 let closeTime1h = 0;
 let closeTime4h = 0;
+let closeTime1d = 0;
 
 // Countdown Interval IDs
 let timerInterval1h = null;
 let timerInterval4h = null;
+let timerInterval1d = null;
 
 // Helper: Convert JS Day (0 = Sun, 1 = Mon, ..., 6 = Sat) to Monday-First Index (0 = Mon, ..., 6 = Sun)
 function getMondayFirstIndex(jsDay) {
@@ -124,6 +131,10 @@ async function fetchHistoricalKlines(symbol) {
     const res4h = await fetch(`https://fapi.binance.com/fapi/v1/klines?symbol=${symbol}&interval=4h&limit=200`);
     candles4h = await res4h.json();
     
+    // 1D: Limit 50 candles (about 7 weeks)
+    const res1d = await fetch(`https://fapi.binance.com/fapi/v1/klines?symbol=${symbol}&interval=1d&limit=50`);
+    candles1d = await res1d.json();
+    
     processHistoricalData();
   } catch (err) {
     console.error('Lỗi khi tải dữ liệu lịch sử klines:', err);
@@ -133,7 +144,7 @@ async function fetchHistoricalKlines(symbol) {
 
 // Process data to find corresponding hour candles for each day of the week
 function processHistoricalData() {
-  if (candles1h.length === 0 || candles4h.length === 0) return;
+  if (candles1h.length === 0 || candles4h.length === 0 || candles1d.length === 0) return;
   
   // --- 1. Process 1-Hour Charts ---
   const latestKline1h = candles1h[candles1h.length - 1];
@@ -257,6 +268,60 @@ function processHistoricalData() {
     else label = `${dist} tuần trước`;
     return { ...item, label };
   });
+
+  // --- 3. Process 1-Day Charts ---
+  const latestKline1d = candles1d[candles1d.length - 1];
+  const targetDayOfWeek1d = new Date(latestKline1d[0]).getDay();
+  closeTime1d = latestKline1d[6];
+  
+  document.getElementById('subtitle-1d').innerText = `So sánh volume giữa các ngày trong tuần`;
+  document.getElementById('subtitle-1d-weeks').innerText = `So sánh volume ngày ${dayNamesVi[getMondayFirstIndex(targetDayOfWeek1d)]} giữa các tuần`;
+  
+  // A. Day of Week Chart (last 7 daily candles)
+  dayData1d = Array(7).fill(null);
+  for (let i = candles1d.length - 1; i >= candles1d.length - 7; i--) {
+    if (i < 0) break;
+    const k = candles1d[i];
+    const date = new Date(k[0]);
+    const idx = getMondayFirstIndex(date.getDay());
+    const isLive = (i === candles1d.length - 1);
+    dayData1d[idx] = {
+      dateStr: `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}`,
+      volume: parseFloat(k[5]),
+      quoteVolume: parseFloat(k[7]),
+      isLive: isLive,
+      openTime: k[0],
+      closeTime: k[6]
+    };
+  }
+
+  // B. Week-over-Week Chart (same weekday)
+  const matches1d = [];
+  for (let i = candles1d.length - 1; i >= 0; i--) {
+    const k = candles1d[i];
+    const date = new Date(k[0]);
+    if (date.getDay() === targetDayOfWeek1d) {
+      const isLive = (i === candles1d.length - 1);
+      matches1d.push({
+        dateStr: `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}`,
+        volume: parseFloat(k[5]),
+        quoteVolume: parseFloat(k[7]),
+        isLive: isLive,
+        openTime: k[0],
+        closeTime: k[6]
+      });
+      if (matches1d.length === 5) break;
+    }
+  }
+  
+  weeksData1d = matches1d.reverse().map((item, idx, arr) => {
+    const dist = (arr.length - 1) - idx;
+    let label = '';
+    if (dist === 0) label = 'Tuần này (Hiện tại)';
+    else if (dist === 1) label = 'Tuần trước';
+    else label = `${dist} tuần trước`;
+    return { ...item, label };
+  });
   
   // Render / Update Charts & Stats
   updateStatsAndCharts();
@@ -264,6 +329,7 @@ function processHistoricalData() {
   // Start Countdowns
   startTimer1h();
   startTimer4h();
+  startTimer1d();
 }
 
 // Compute metrics (average volume, comparison percentage) and render charts
@@ -343,6 +409,43 @@ function updateStatsAndCharts() {
       compareEl.style.color = pct >= 100 ? 'var(--color-up)' : (pct >= 70 ? '#eab308' : 'var(--text-muted)');
     }
   }
+
+  // --- 1D ---
+  // A. Day of week
+  const liveCandle1d = dayData1d.find(c => c && c.isLive);
+  if (liveCandle1d) {
+    const currentVol1d = liveCandle1d.volume;
+    document.getElementById('value-current-1d').innerHTML = `${formatLargeNumber(currentVol1d)} <span style="font-size: 0.875rem; color: var(--text-secondary); font-weight: 500;">${coin}</span>`;
+    
+    const otherDays1d = dayData1d.filter(c => c && !c.isLive);
+    if (otherDays1d.length > 0) {
+      const avgVol1d = otherDays1d.reduce((sum, c) => sum + c.volume, 0) / otherDays1d.length;
+      document.getElementById('value-avg-1d').innerHTML = `${formatLargeNumber(avgVol1d)} <span style="font-size: 0.875rem; color: var(--text-secondary); font-weight: 500;">${coin}</span>`;
+      
+      const pct = (currentVol1d / avgVol1d) * 100;
+      const compareEl = document.getElementById('compare-1d');
+      compareEl.innerText = `${pct.toFixed(1)}% so với trung bình`;
+      compareEl.style.color = pct >= 100 ? 'var(--color-up)' : (pct >= 70 ? '#eab308' : 'var(--text-muted)');
+    }
+  }
+
+  // B. Weeks
+  const liveWeekCandle1d = weeksData1d.find(c => c && c.isLive);
+  if (liveWeekCandle1d) {
+    const currentVol1dWeeks = liveWeekCandle1d.volume;
+    document.getElementById('value-current-1d-weeks').innerHTML = `${formatLargeNumber(currentVol1dWeeks)} <span style="font-size: 0.875rem; color: var(--text-secondary); font-weight: 500;">${coin}</span>`;
+    
+    const otherWeeks1d = weeksData1d.filter(c => c && !c.isLive);
+    if (otherWeeks1d.length > 0) {
+      const avgVol1dWeeks = otherWeeks1d.reduce((sum, c) => sum + c.volume, 0) / otherWeeks1d.length;
+      document.getElementById('value-avg-1d-weeks').innerHTML = `${formatLargeNumber(avgVol1dWeeks)} <span style="font-size: 0.875rem; color: var(--text-secondary); font-weight: 500;">${coin}</span>`;
+      
+      const pct = (currentVol1dWeeks / avgVol1dWeeks) * 100;
+      const compareEl = document.getElementById('compare-1d-weeks');
+      compareEl.innerText = `${pct.toFixed(1)}% so với trung bình các tuần trước`;
+      compareEl.style.color = pct >= 100 ? 'var(--color-up)' : (pct >= 70 ? '#eab308' : 'var(--text-muted)');
+    }
+  }
   
   // Render charts
   renderChart('chart-1h-canvas', dayData1h, chart1h, (newChart) => { chart1h = newChart; }, '1H Volume theo ngày');
@@ -350,6 +453,9 @@ function updateStatsAndCharts() {
   
   renderChart('chart-4h-canvas', dayData4h, chart4h, (newChart) => { chart4h = newChart; }, '4H Volume theo ngày');
   renderChart('chart-4h-weeks-canvas', weeksData4h, chart4hWeeks, (newChart) => { chart4hWeeks = newChart; }, '4H Volume theo tuần', true);
+
+  renderChart('chart-1d-canvas', dayData1d, chart1d, (newChart) => { chart1d = newChart; }, '1D Volume theo ngày');
+  renderChart('chart-1d-weeks-canvas', weeksData1d, chart1dWeeks, (newChart) => { chart1dWeeks = newChart; }, '1D Volume theo tuần', true);
 }
 
 // Standard helper to render/update a Chart.js bar chart
@@ -549,6 +655,38 @@ function startTimer4h() {
   timerInterval4h = setInterval(updateTimer, 1000);
 }
 
+// 1D Countdown Timer
+function startTimer1d() {
+  if (timerInterval1d) clearInterval(timerInterval1d);
+  
+  const timerEl1 = document.getElementById('timer-1d');
+  const timerEl2 = document.getElementById('timer-1d-weeks');
+  
+  function updateTimer() {
+    const now = Date.now();
+    const timeLeft = closeTime1d - now;
+    
+    if (timeLeft <= 0) {
+      timerEl1.innerText = '00:00:00';
+      timerEl2.innerText = '00:00:00';
+      clearInterval(timerInterval1d);
+      setTimeout(() => fetchHistoricalKlines(currentSymbol), 3000);
+      return;
+    }
+    
+    const hours = Math.floor(timeLeft / 3600000);
+    const minutes = Math.floor((timeLeft % 3600000) / 60000);
+    const seconds = Math.floor((timeLeft % 60000) / 1000);
+    const text = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    
+    timerEl1.innerText = text;
+    timerEl2.innerText = text;
+  }
+  
+  updateTimer();
+  timerInterval1d = setInterval(updateTimer, 1000);
+}
+
 // Initialize real-time WebSocket connection to Binance
 function initWebSocket(symbol) {
   if (socket) {
@@ -561,6 +699,7 @@ function initWebSocket(symbol) {
   const streams = [
     `${symbol.toLowerCase()}@kline_1h`,
     `${symbol.toLowerCase()}@kline_4h`,
+    `${symbol.toLowerCase()}@kline_1d`,
     `${symbol.toLowerCase()}@ticker`
   ].join('/');
   
@@ -621,6 +760,26 @@ function initWebSocket(symbol) {
       
       updateStatsAndCharts();
     }
+    else if (stream.includes('@kline_1d')) {
+      const kline = data.k;
+      const klineOpenTime = kline.t;
+      closeTime1d = kline.T; // Update closest 1d end timestamp
+      
+      const todayIdx = getMondayFirstIndex(new Date(klineOpenTime).getDay());
+      
+      if (dayData1d[todayIdx] && dayData1d[todayIdx].isLive) {
+        dayData1d[todayIdx].volume = parseFloat(kline.v);
+        dayData1d[todayIdx].quoteVolume = parseFloat(kline.q);
+      }
+      
+      const liveWeek1d = weeksData1d.find(c => c && c.isLive);
+      if (liveWeek1d) {
+        liveWeek1d.volume = parseFloat(kline.v);
+        liveWeek1d.quoteVolume = parseFloat(kline.q);
+      }
+      
+      updateStatsAndCharts();
+    }
   };
   
   socket.onclose = () => {
@@ -642,8 +801,10 @@ async function initApp(symbol) {
   // 1. Reset variables
   dayData1h = Array(7).fill(null);
   dayData4h = Array(7).fill(null);
+  dayData1d = Array(7).fill(null);
   weeksData1h = [];
   weeksData4h = [];
+  weeksData1d = [];
   
   // 2. Fetch Initial Prices & History
   await fetchTickerInfo(symbol);

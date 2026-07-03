@@ -231,6 +231,94 @@
         <canvas id="chart-4h-weeks-canvas"></canvas>
       </div>
     </section>
+
+    <!-- 1-Day Volume Chart Card -->
+    <section class="card" id="card-1d">
+      <div class="card-header">
+        <div class="card-title-group">
+          <h2 class="card-title">
+            <i class="fa-solid fa-calendar-day" style="color: #10b981;"></i>
+            Volume Khung 1 Ngày (1D)
+          </h2>
+          <span class="card-subtitle" id="subtitle-1d">So sánh volume tại các ngày trong tuần</span>
+        </div>
+        
+        <div class="countdown-container">
+          <span class="countdown-label">Đóng khung sau</span>
+          <div class="countdown-badge" id="countdown-1d" style="color: #10b981; border-color: rgba(16, 185, 129, 0.3);">
+            <i class="fa-solid fa-hourglass-half"></i>
+            <span id="timer-1d">--:--:--</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Summary stats -->
+      <div class="stat-summary">
+        <div class="stat-box">
+          <span class="stat-label">Volume Hiện Tại</span>
+          <span class="stat-value" id="value-current-1d">0.00</span>
+          <span class="stat-compare" id="compare-1d" style="color: var(--text-muted);">
+            Đang tích lũy...
+          </span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-label">TB Các Ngày Khác</span>
+          <span class="stat-value" id="value-avg-1d">0.00</span>
+          <span class="stat-compare" style="color: var(--text-muted);">
+            Cùng các ngày trong tuần
+          </span>
+        </div>
+      </div>
+      
+      <!-- Chart Area -->
+      <div class="chart-container">
+        <canvas id="chart-1d-canvas"></canvas>
+      </div>
+    </section>
+
+    <!-- 1-Day Volume Chart (Past Weeks) Card -->
+    <section class="card" id="card-1d-weeks">
+      <div class="card-header">
+        <div class="card-title-group">
+          <h2 class="card-title">
+            <i class="fa-solid fa-calendar-days" style="color: #34d399;"></i>
+            Volume 1D - So sánh các tuần trước
+          </h2>
+          <span class="card-subtitle" id="subtitle-1d-weeks">So sánh volume ngày này ở các tuần trước</span>
+        </div>
+        
+        <div class="countdown-container">
+          <span class="countdown-label">Đóng khung sau</span>
+          <div class="countdown-badge" id="countdown-1d-weeks" style="color: #34d399; border-color: rgba(52, 211, 153, 0.3);">
+            <i class="fa-solid fa-hourglass-half"></i>
+            <span id="timer-1d-weeks">--:--:--</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Summary stats -->
+      <div class="stat-summary">
+        <div class="stat-box">
+          <span class="stat-label">Volume Hiện Tại</span>
+          <span class="stat-value" id="value-current-1d-weeks">0.00</span>
+          <span class="stat-compare" id="compare-1d-weeks" style="color: var(--text-muted);">
+            Đang tích lũy...
+          </span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-label">TB Các Tuần Trước</span>
+          <span class="stat-value" id="value-avg-1d-weeks">0.00</span>
+          <span class="stat-compare" style="color: var(--text-muted);">
+            Trung bình các tuần trước
+          </span>
+        </div>
+      </div>
+      
+      <!-- Chart Area -->
+      <div class="chart-container">
+        <canvas id="chart-1d-weeks-canvas"></canvas>
+      </div>
+    </section>
   </main>
 
   <!-- Footer -->
