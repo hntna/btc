@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crypto Volume Analyzer - Real-time Dashboard</title>
+  
+  <!-- CSS Styles -->
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- Google Font Outfit & FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Chart.js Library -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="logo-section">
+      <i class="fa-solid fa-chart-line logo-icon"></i>
+      <div>
+        <h1>Crypto Volume Analyzer</h1>
+      </div>
+    </div>
+    
+    <div class="realtime-status">
+      <!-- Price Display -->
+      <div class="price-card">
+        <span class="price-symbol" id="ticker-symbol">ETH/USDT</span>
+        <span class="price-value" id="ticker-price">---.--</span>
+        <span class="price-change" id="ticker-change">
+          <i class="fa-solid" id="ticker-change-icon"></i>
+          <span id="ticker-change-val">-.--%</span>
+        </span>
+      </div>
+      
+      <!-- Connection Badge -->
+      <div class="status-badge">
+        <div class="status-dot connecting" id="status-dot"></div>
+        <span id="status-text">Đang kết nối WebSocket...</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Controls Bar -->
+  <div class="controls-bar">
+    <label for="symbol-select" style="display:none;">Chọn cặp giao dịch</label>
+    <select class="symbol-selector" id="symbol-select">
+      <option value="ETHUSDT" selected>ETH / USDT</option>
+      <option value="BTCUSDT">BTC / USDT</option>
+    </select>
+  </div>
+
+  <!-- Main Dashboard Grid -->
+  <main class="dashboard-grid">
+    
+    <!-- 1-Hour Volume Chart Card -->
+    <section class="card" id="card-1h">
+      <div class="card-header">
+        <div class="card-title-group">
+          <h2 class="card-title">
+            <i class="fa-regular fa-clock" style="color: #6366f1;"></i>
+            Volume Khung 1 Giờ (1H)
+          </h2>
+          <span class="card-subtitle" id="subtitle-1h">So sánh volume tại cùng khung giờ local của các ngày trong tuần</span>
+        </div>
+        
+        <div class="countdown-container">
+          <span class="countdown-label">Đóng khung sau</span>
+          <div class="countdown-badge" id="countdown-1h">
+            <i class="fa-solid fa-hourglass-half"></i>
+            <span id="timer-1h">--:--</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Summary stats -->
+      <div class="stat-summary">
+        <div class="stat-box">
+          <span class="stat-label">Volume Hiện Tại</span>
+          <span class="stat-value" id="value-current-1h">0.00</span>
+          <span class="stat-compare" id="compare-1h" style="color: var(--text-muted);">
+            Đang tích lũy...
+          </span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-label">TB Các Ngày Khác</span>
+          <span class="stat-value" id="value-avg-1h">0.00</span>
+          <span class="stat-compare" style="color: var(--text-muted);">
+            Cùng khung giờ trong tuần
+          </span>
+        </div>
+      </div>
+      
+      <!-- Chart Area -->
+      <div class="chart-container">
+        <canvas id="chart-1h-canvas"></canvas>
+      </div>
+    </section>
+
+    <!-- 4-Hour Volume Chart Card -->
+    <section class="card" id="card-4h">
+      <div class="card-header">
+        <div class="card-title-group">
+          <h2 class="card-title">
+            <i class="fa-solid fa-business-time" style="color: #06b6d4;"></i>
+            Volume Khung 4 Giờ (4H)
+          </h2>
+          <span class="card-subtitle" id="subtitle-4h">So sánh volume tại cùng khung 4H local của các ngày trong tuần</span>
+        </div>
+        
+        <div class="countdown-container">
+          <span class="countdown-label">Đóng khung sau</span>
+          <div class="countdown-badge" id="countdown-4h" style="color: #06b6d4; border-color: rgba(6, 182, 212, 0.3);">
+            <i class="fa-solid fa-hourglass-half"></i>
+            <span id="timer-4h">--:--:--</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Summary stats -->
+      <div class="stat-summary">
+        <div class="stat-box">
+          <span class="stat-label">Volume Hiện Tại</span>
+          <span class="stat-value" id="value-current-4h">0.00</span>
+          <span class="stat-compare" id="compare-4h" style="color: var(--text-muted);">
+            Đang tích lũy...
+          </span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-label">TB Các Ngày Khác</span>
+          <span class="stat-value" id="value-avg-4h">0.00</span>
+          <span class="stat-compare" style="color: var(--text-muted);">
+            Cùng khung giờ trong tuần
+          </span>
+        </div>
+      </div>
+      
+      <!-- Chart Area -->
+      <div class="chart-container">
+        <canvas id="chart-4h-canvas"></canvas>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <i class="fa-brands fa-github"></i>
+    <span>Dự án mã nguồn mở lưu tại</span>
+    <a href="https://github.com/hntna/btc" target="_blank">github.com/hntna/btc</a>
+  </footer>
+
+  <!-- JS Logic -->
+  <script src="app.js"></script>
+</body>
+</html>
