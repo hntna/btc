@@ -106,7 +106,7 @@ function updateTickerUI(priceStr, percentStr, symbol) {
   const percent = parseFloat(percentStr);
   const coin = symbol.replace('USDT', '');
   
-  symbolEl.innerText = `${coin}/USDT`;
+  symbolEl.innerText = `${coin}USDT Perpetual`;
   priceEl.innerText = price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   
   changeValEl.innerText = `${percent >= 0 ? '+' : ''}${percent.toFixed(2)}%`;
